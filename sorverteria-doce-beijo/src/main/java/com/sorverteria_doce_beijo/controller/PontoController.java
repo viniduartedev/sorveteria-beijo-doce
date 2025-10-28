@@ -1,6 +1,7 @@
 package com.sorverteria_doce_beijo.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,23 +25,13 @@ public class PontoController {
         this.pontoService = pontoService;
     }
 
-    @PostMapping("/{cpf}")
-    public ResponseEntity<Ponto> registrar(@PathVariable String cpf, @RequestBody Ponto ponto) {
-        return ResponseEntity.ok(pontoService.registrarPonto(cpf, ponto));
-    }
-
     @GetMapping
     public ResponseEntity<List<Ponto>> listarTodos() {
         return ResponseEntity.ok(pontoService.listarTodos());
     }
 
-    @GetMapping("/cliente/{cpf}")
-    public ResponseEntity<List<Ponto>> listarPorCliente(@PathVariable String cpf) {
-        return ResponseEntity.ok(pontoService.listarPorCliente(cpf));
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<Ponto> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<Optional<Ponto>> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(pontoService.buscarPorId(id));
     }
 

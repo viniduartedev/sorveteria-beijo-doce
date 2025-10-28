@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sorverteria_doce_beijo.dto.CompraDTO;
 import com.sorverteria_doce_beijo.entity.Cliente;
 import com.sorverteria_doce_beijo.entity.Compra;
 import com.sorverteria_doce_beijo.exception.ResourceNotFoundException;
@@ -27,18 +28,20 @@ public class CompraService {
         this.clienteService = clienteService;
     }
 
-    public Compra registrarCompra(String cpf, BigDecimal valorCompra) {
+    public Compra registrarCompra(String cpf, CompraDTO dto) {
         Cliente cliente = clienteRepository.findByCpf(cpf)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com CPF: " + cpf));
 
         Compra novaCompra = new Compra();
         novaCompra.setCliente(cliente);
-        novaCompra.setValor(valorCompra);
+        novaCompra.setValor(dto.getValor());
+        novaCompra.setDescricao(dto.getDescricao());
         novaCompra.setData(LocalDateTime.now());
 
         compraRepository.save(novaCompra);
 
-        pontoService.adicionarPonto(cpf, valorCompra, "Compra");
+        // Gera pontos automaticamente
+        pontoService.adicionarPonto(cpf, dto.getValor(), "Compra");
 
         return novaCompra;
     }

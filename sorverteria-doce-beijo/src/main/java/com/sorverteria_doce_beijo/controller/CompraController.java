@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sorverteria_doce_beijo.dto.CompraDTO;
 import com.sorverteria_doce_beijo.entity.Compra;
 import com.sorverteria_doce_beijo.service.CompraService;
 
@@ -24,8 +25,9 @@ public class CompraController {
     }
 
     @PostMapping("/{cpf}")
-    public ResponseEntity<Compra> registrarCompra(@PathVariable String cpf, @RequestBody Compra compra) {
-        return ResponseEntity.ok(compraService.registrarCompra(cpf, compra));
+    public ResponseEntity<Compra> registrarCompra(@PathVariable String cpf, @RequestBody CompraDTO dto) {
+        Compra novaCompra = compraService.registrarCompra(cpf, dto);
+        return ResponseEntity.ok(novaCompra);
     }
 
     @GetMapping
@@ -33,8 +35,4 @@ public class CompraController {
         return ResponseEntity.ok(compraService.listarCompras());
     }
 
-    @GetMapping("/cliente/{cpf}")
-    public ResponseEntity<List<Compra>> listarPorCliente(@PathVariable String cpf) {
-        return ResponseEntity.ok(compraService.listarComprasPorCliente(cpf));
-    }
 }

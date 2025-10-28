@@ -3,6 +3,7 @@ package com.sorverteria_doce_beijo.service;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -28,10 +29,6 @@ public class PontoService {
         this.bonificacaoRepository = bonificacaoRepository;
     }
 
-    public List<Ponto> listarPorCliente(Long clienteId) {
-        return pontoRepository.findByClienteId(clienteId);
-    }
-
     public Ponto adicionarPonto(String cpf, BigDecimal valorCompra, String origem) {
         Cliente cliente = clienteRepository.findByCpf(cpf)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com CPF: " + cpf));
@@ -40,20 +37,18 @@ public class PontoService {
 
         int pontos = calcularPontos(valorCompra, bonificacao);
 
-        Ponto novo = Ponto.builder()
-                .cliente(cliente)
-                .bonificacao(bonificacao)
-                .pontos(pontos)
-                .valorCompra(valorCompra.doubleValue())
-                .origem(origem)
-                .build();
+        Ponto novo = new Ponto();
+        novo.setCliente(cliente);
+        novo.setBonificacao(bonificacao);
+        novo.setPontos(pontos);
+        novo.setValorCompra(valorCompra.doubleValue());
+        novo.setOrigem(origem);
 
         return pontoRepository.save(novo);
     }
 
     private Bonificacao buscarBonificacaoAplicavel(BigDecimal valorCompra) {
         return bonificacaoRepository.findAll().stream()
-                .filter(Bonificacao::getAtivo)
                 .filter(b -> valorCompra.doubleValue() >= b.getValorMinimo())
                 .max(Comparator.comparing(Bonificacao::getValorMinimo))
                 .orElseThrow(() -> new ResourceNotFoundException("Nenhuma bonificação aplicável encontrada"));
@@ -70,5 +65,14 @@ public class PontoService {
         Ponto ponto = pontoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Registro de ponto não encontrado"));
         pontoRepository.delete(ponto);
+    }
+
+    public List<Ponto> listarTodos() {
+        return pontoRepository.findAll();
+    }
+
+    public Optional<Ponto> buscarPorId(Long id) {
+        Optional<Ponto> ponto = pontoRepository.findById(id);
+        return ponto;
     }
 }
